@@ -1,0 +1,45 @@
+<!-- mirrory -->
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Project Indigo</title>
+		<link rel="stylesheet" href="/css/styles.css" />
+		<script type="text/javascript" src="/js/indigo.js"></script>
+	</head>
+	<body onload="welcome()">
+		<h2>Project Indigo</h2>
+		<div id="container">
+			<div id="controls">
+				<div id="helpctrls">
+					<button id="help" onclick="sendhelp()">Help</button>
+				</div>
+				<div id="filectrls">
+					<button id="save" onclick="savefile()">Save</button>
+					<button id="savecopy" onclick="savefilecopy()">Save as Copy</button>
+					<button id="load" onclick="loadfile()">Load</button>
+				</div>
+				<div id="dir1">
+					<button id="north" onclick="move('n')">^</button>
+				</div>
+				<div id="dir2">
+					<button id="west" onclick="move('w')"><</button>
+					&nbsp;
+					<button id="east" onclick="move('e')">></button>
+				</div>
+				<div id="dir3">
+					<button id="south" onclick="move('s')">v</button>
+				</div>
+			</div>
+			<div id="main">
+				<textarea id="output" disabled="disabled"></textarea>
+				<input id="cmd" type="text"></input>
+			</div>
+			<div id="viewer">
+				<img src="/img/1.png" alt="...???...">
+			</div>
+			<br style="clear: left;" />
+		</div>
+		<p id="helpzone">Guide</p>
+		<p>project indigo by mirrory</p>
+	</body>
+</html>

@@ -1,0 +1,105 @@
+/* mirrory */
+
+body {
+	background-color: #0033cc;
+	color: #ffffff;
+	font-family: 'Courier New', monospace;
+}
+
+#controls, button, #output, #cmd, #viewer {
+	background-color: #000000;
+	color: #ffffff;
+	font-family: 'Courier New', monospace;
+}
+
+/* left pane */
+#helpctrls, #filectrls, #dir1, #dir2, #dir3 {
+	text-align: center;
+}
+
+#helpctrls {
+	padding: 10px 0px 5px 0px;
+}
+
+#filectrls {
+	padding-top: 18px;
+}
+
+#dir1 {
+	padding-top: 31px;
+}
+
+/* directional button aesthetics */
+#north, #south {
+	font-family: Arial, sans-serif;
+}
+
+#north {
+	font-size: 15pt;
+	height: 25px;
+}
+
+#south {
+	font-size: 12pt;
+}
+
+#east, #west {
+	font-weight: bold;
+}
+
+/* layout */
+#container {
+	width: 100%;
+}
+
+/* console and input box take up most of the screen space */
+#main {
+	width: 63%;
+}
+
+#output, #cmd {
+	width: 100%;
+}
+
+#output {
+	resize: none;
+	min-height: 600px;
+}
+
+/* layout alignment plus spacing */
+#controls, #main, #viewer {
+	float: left;
+}
+
+#controls, #main {
+	margin-right: 5px;
+}
+
+#controls, #viewer {
+	min-height: 634px;
+}
+
+#controls {
+	width: 17%;
+}
+
+#viewer {
+	width: 18%;
+	margin-left: 5px;
+}
+
+/* scrollbar  */
+::-webkit-scrollbar {
+	width: 12px;
+	height: 12px;
+}
+
+::-webkit-scrollbar-track {
+	background: #0029A3;
+	border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+	border-radius: 10px;
+	background: #7373FF;  
+}
