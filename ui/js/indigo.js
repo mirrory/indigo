@@ -1,29 +1,50 @@
 /* mirrory */
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 // Runs a user command on the server.
 function runCommand(command) {
-    // don't check command content here
-    // except for input sanitization
-    // and that it's a legit valid command maybe in some ways
-    // just construct a POST /cmd request with the command data
-    // construct request
-    // send request async
-    // await get response
-    // return response
-    return "I understand...";
+    return __awaiter(this, void 0, void 0, function* () {
+        // don't check command content here
+        // except for input sanitization
+        // and that it's a legit valid command maybe in some ways
+        // just construct a POST /cmd request with the command data
+        // construct request
+        // send request async
+        // await get response
+        // return response
+        const response = yield fetch("http://192.168.56.101:8080/commands", {
+            method: 'POST',
+            body: '{"command": "' + command + '", "flags": "abcd"}',
+            headers: { 'Content-Type': 'application/json; charset=UTF-8' }
+        });
+        if (!response.ok) { /* fail */ }
+        let asJSON = { "response": "??" };
+        if (response.body !== null) {
+            asJSON = yield response.json();
+        }
+        return asJSON.response;
+    });
 }
 // Shows the welcome message and enables the command line
 function welcome() {
-    var output = document.querySelector('#output');
+    let output = document.querySelector('#output');
     output.innerHTML += "Welcome to Project Indigo. There is a void here." + "\n";
-    var cmd = document.querySelector('#cmd');
-    cmd.addEventListener('keydown', function (e) {
-        var output = document.querySelector('#output');
+    let cmd = document.querySelector('#cmd');
+    cmd.addEventListener('keydown', (e) => __awaiter(this, void 0, void 0, function* () {
+        let output = document.querySelector('#output');
         if (e.key === "Enter") {
-            output.innerHTML += runCommand(cmd.value) + "\n";
+            output.innerHTML += (yield runCommand(cmd.value)) + "\n";
             output.scrollTop = output.scrollHeight;
             cmd.value = "";
         }
-    });
+    }));
 }
 // sends you to the help zone
 function sendhelp() {
@@ -48,7 +69,9 @@ function loadfile() {
 }
 // shortcut function to run a move command via a button
 function move(direction) {
-    var output = document.querySelector('#output');
-    output.innerHTML += runCommand("move " + direction) + "\n";
-    output.scrollTop = output.scrollHeight;
+    return __awaiter(this, void 0, void 0, function* () {
+        let output = document.querySelector('#output');
+        output.innerHTML += (yield runCommand("move " + direction)) + "\n";
+        output.scrollTop = output.scrollHeight;
+    });
 }

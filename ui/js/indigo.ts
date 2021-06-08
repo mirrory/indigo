@@ -1,7 +1,7 @@
 /* mirrory */
 
 // Runs a user command on the server.
-function runCommand(command) {
+async function runCommand(command) {
 	// don't check command content here
 	// except for input sanitization
 	// and that it's a legit valid command maybe in some ways
@@ -11,7 +11,20 @@ function runCommand(command) {
 	// send request async
 	// await get response
 	// return response
-	return "I understand...";
+	const response = await fetch("http://192.168.56.101:8080/commands", {
+  		method: 'POST',
+  		body: '{"command": "' + command + '", "flags": "abcd"}',
+  		headers: {'Content-Type': 'application/json; charset=UTF-8'} });
+
+	if (!response.ok) { /* fail */ }
+
+	let asJSON = {"response": "??"}
+	
+	if (response.body !== null) {
+  		asJSON = await response.json();
+	}
+
+	return asJSON.response;
 }
 
 // Shows the welcome message and enables the command line
@@ -20,11 +33,11 @@ function welcome() {
 	output.innerHTML += "Welcome to Project Indigo. There is a void here." + "\n";
 
 	let cmd = <HTMLInputElement>document.querySelector('#cmd');
-	cmd.addEventListener('keydown', (e: KeyboardEvent) => {
+	cmd.addEventListener('keydown', async (e: KeyboardEvent) => {
   		let output = document.querySelector('#output');
   		if (e.key === "Enter")
   		{
-  			output.innerHTML += runCommand(cmd.value) + "\n";
+  			output.innerHTML += await runCommand(cmd.value) + "\n";
     		output.scrollTop = output.scrollHeight;
     		cmd.value = "";
   		}
@@ -57,8 +70,8 @@ function loadfile() {
 }
 
 // shortcut function to run a move command via a button
-function move(direction) {
+async function move(direction) {
 	let output = document.querySelector('#output');
-	output.innerHTML += runCommand("move " + direction) + "\n";
+	output.innerHTML += await runCommand("move " + direction) + "\n";
 	output.scrollTop = output.scrollHeight;
 }
