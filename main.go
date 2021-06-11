@@ -15,6 +15,7 @@ import (
 	"encoding/json"
 	"io"
 	"io/ioutil"
+	// "go.mongodb.org/mongo-driver/mongo"
 )
 
 // Models
@@ -26,6 +27,7 @@ type Command struct {
 
 type Response struct {
 	ResponseText string `json:"response"`
+	ImageFileName string `json:"imagefile"`
 }
 
 type Job struct {
@@ -116,7 +118,7 @@ func ProcessCommands (w http.ResponseWriter, r *http.Request){
 	var re Response
 	var ret string
 	ret = "Cmd echo: " + cmd.CommandText
-	re = Response{ResponseText:ret} 
+	re = Response{ResponseText:ret,ImageFileName:"2.png"} 
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -130,3 +132,15 @@ func ProcessCommands (w http.ResponseWriter, r *http.Request){
 		panic(err)
 	}
 }
+
+// Handles writing to database
+/* func WriteToDB(){
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	defer cancel()
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://root:root@localhost:27017"))
+	if (err != nil) { return err }
+	collection := client.Database("indigo").Collection("main")
+	res, err := collection.InsertOne(context.Background(), bson.M{"entity": "me"})
+	if err != nil { return err }
+	id := res.InsertedID
+} */

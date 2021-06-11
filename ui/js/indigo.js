@@ -25,10 +25,12 @@ function runCommand(command) {
             headers: { 'Content-Type': 'application/json; charset=UTF-8' }
         });
         if (!response.ok) { /* fail */ }
-        let asJSON = { "response": "??" };
+        let asJSON = { "response": "??", "imagefile": "1.png" };
         if (response.body !== null) {
             asJSON = yield response.json();
         }
+        let viewer = document.querySelector('#viewerimg');
+        viewer.src = "/img/" + asJSON.imagefile;
         return asJSON.response;
     });
 }

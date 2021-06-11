@@ -18,11 +18,14 @@ async function runCommand(command) {
 
 	if (!response.ok) { /* fail */ }
 
-	let asJSON = {"response": "??"}
+	let asJSON = {"response": "??", "imagefile": "1.png"}
 	
 	if (response.body !== null) {
   		asJSON = await response.json();
 	}
+
+	let viewer = <HTMLImageElement>document.querySelector('#viewerimg');
+	viewer.src = "/img/" + asJSON.imagefile;
 
 	return asJSON.response;
 }
