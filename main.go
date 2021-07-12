@@ -15,7 +15,11 @@ import (
 	"encoding/json"
 	"io"
 	"io/ioutil"
-	// "go.mongodb.org/mongo-driver/mongo"
+	"strconv"
+	"context"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 // Models
@@ -117,7 +121,16 @@ func ProcessCommands (w http.ResponseWriter, r *http.Request){
 	// Here is where we can decide the response based on the request.
 	var re Response
 	var ret string
-	ret = "Cmd echo: " + cmd.CommandText
+
+	// Decide what to do based on command
+	if cmd.CommandText == "c" {
+		ret = "Added: " + WriteToDB()
+	} else if cmd.CommandText == "r" {
+		ret = "There Are: " + strconv.FormatInt(ReadFromDB(), 10)
+	} else {
+		ret = "Cmd echo: " + cmd.CommandText
+	}
+
 	re = Response{ResponseText:ret,ImageFileName:"2.png"} 
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
@@ -134,13 +147,49 @@ func ProcessCommands (w http.ResponseWriter, r *http.Request){
 }
 
 // Handles writing to database
-/* func WriteToDB(){
+// Todo DEFER a call to disconnect the client https://pkg.go.dev/go.mongodb.org/mongo-driver#readme-installation
+func WriteToDB() string {
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://root:root@localhost:27017"))
-	if (err != nil) { return err }
+	// Todo auth root:root@
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:27017"))
+	// Todo figure out how to convert err to string
+	if (err != nil) { return "" }
 	collection := client.Database("indigo").Collection("main")
 	res, err := collection.InsertOne(context.Background(), bson.M{"entity": "me"})
-	if err != nil { return err }
+	if (err != nil) { return "" }
 	id := res.InsertedID
-} */
+	if (id != nil) { 
+		return "Success" 
+	} else { 
+		return "Failure" 
+	}
+}
+
+// Handles reading from database
+// Todo DEFER a call to disconnect the client https://pkg.go.dev/go.mongodb.org/mongo-driver#readme-installation
+func ReadFromDB() int64 {
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	defer cancel()
+	// Todo auth root:root@
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:27017"))
+	if (err != nil) { return -1 }
+	collection := client.Database("indigo").Collection("main")
+	opts := options.Count().SetMaxTime(2 * time.Second)
+	count, err := collection.CountDocuments(context.Background(), bson.D{{"entity", "me"}}, opts)
+	if err != nil {
+		log.Fatal(err)
+		return -1
+	}
+	return count
+	/* cur, err := collection.Find(context.Background(), bson.D{})
+	if err != nil { log.Fatal(err) }
+	defer cur.Close(context.Background())
+	for cur.Next(context.Background()) {
+		raw := cur.Current 
+		return raw
+	}
+	if err := cur.Err(); err != nil {
+		return err
+	} */
+}
