@@ -15,8 +15,10 @@ import (
 	"encoding/json"
 	"io"
 	"io/ioutil"
+	"os"
 	"strconv"
 	"context"
+	"strings"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/bson"
@@ -27,6 +29,49 @@ import (
 type Command struct {
 	CommandText string `json:"command"`
 	Flags string `json:"flags"`
+}
+
+type Dialogue struct {
+	Introduction string `json:"introduction"`
+	SettlementNew string `json:"settlement-new"`
+	BusinessNew string `json:"business-new"`
+	ChemicalNew string `json:"chemical-new"`
+	EducationLearn string `json:"education-learn"`
+	BudgetSet string `json:"budget-set"`
+	PersonNew string `json:"person-new"`
+	PersonNewName string `json:"person-new-name"`
+	PersonTalk string `json:"person-talk"`
+	PersonEat string `json:"person-eat"`
+	PersonCook string `json:"person-cook"`
+	PersonAddToParty string `json:"person-add-to-party"`
+	PersonExercise string `json:"person-exercise"`
+	PersonSetLanguage string `json:"person-set-language"`
+	LanguageMode string `json:"language-mode"`
+	PersonEstablishRelationship string `json:"person-establish-relationship"`
+	PersonRelationshipType string `json:"person-relationship-type"`
+	PersonSetBirthday string `json:"person-set-birthday"`
+	PersonSetBio string `json:"person-set-bio"`
+	PersonSetAlignment string `json:"person-set-alignment"`
+	LawNew string `json:"law-new"`
+	TimeTravel string `json:"time-travel"`
+	ReligionNew string `json:"religion-new"`
+	AdventureNew string `json:"adventure-new"`
+	SettingsConfirm string `json:"settings-confirm"`
+	SpeciesNew string `json:"species-new"`
+	M string `json:"m"`
+	Help string `json:"help"`
+	StatsRandom string `json:"stats-random"`
+	ParticleNew string `json:"particle-new"`
+	MusicControl string `json:"music-control"`
+	PaintingNew string `json:"painting-new"`
+	PlanetNew string `json:"planet-new"`
+	ThemeChange string `json:"theme-change"`
+	DiseaseNew string `json:"disease-new"`
+	TechnologyNew string `json:"technology-new"`
+	LandNew string `json:"land-new"`
+	SaveFile string `json:"save-file"`
+	PsychologyInspect string `json:"psychology-inspect"`
+	LoadFile string `json:"load-file"`
 }
 
 type Response struct {
@@ -118,17 +163,118 @@ func ProcessCommands (w http.ResponseWriter, r *http.Request){
 		} */
 	}
 
+	// TODO: Refactor to manage opening/closing this file A LOT in parallel
+	jsonFile, err := os.Open("dialogue.json")
+	if err != nil {
+    	fmt.Println(err)
+	}
+	defer jsonFile.Close()
+	byteValue, _ := ioutil.ReadAll(jsonFile)
+	var dialogue Dialogue
+	json.Unmarshal(byteValue, &dialogue)
+
 	// Here is where we can decide the response based on the request.
 	var re Response
 	var ret string
 
+	commandFlags := strings.Split(cmd.Flags, " ")
+	flagMap := map[string]string{}
+
+	if commandFlags != nil {
+		for i := 0; i < len(commandFlags); i++ {
+			if (i % 2 != 0) {
+				flagName := commandFlags[i-1][1:len(commandFlags[i-1])]
+				flagMap[flagName] = commandFlags[i]
+			} 
+		}
+	}
+
 	// Decide what to do based on command
-	if cmd.CommandText == "c" {
-		ret = "Added: " + WriteToDB()
+	if cmd.CommandText == "a" {
+		ret = dialogue.SettlementNew
+	} else if cmd.CommandText == "b" {
+		ret = dialogue.BusinessNew
+	} else if cmd.CommandText == "c" {
+		ret = dialogue.ChemicalNew + "Added: " + WriteToDB()
+	} else if cmd.CommandText == "d" {
+		ret = dialogue.EducationLearn
+	} else if cmd.CommandText == "e" {
+		ret = dialogue.BudgetSet
+	} else if cmd.CommandText == "f" {
+		// Person/people management command.
+		if personName, ok := flagMap["n"]; ok {
+			ret = fmt.Sprintf(dialogue.PersonNewName, personName)
+		} else if personName, ok := flagMap["t"]; ok {
+			ret = fmt.Sprintf(dialogue.PersonTalk, personName)
+		} else if meal, ok := flagMap["f"]; ok {
+			ret = fmt.Sprintf(dialogue.PersonEat, meal)
+		} else if personName, ok := flagMap["o"]; ok {
+			ret = fmt.Sprintf(dialogue.PersonCook, personName)
+		} else if personName, ok := flagMap["a"]; ok {
+			ret = fmt.Sprintf(dialogue.PersonAddToParty, personName)
+		} else if personName, ok := flagMap["e"]; ok {
+			ret = fmt.Sprintf(dialogue.PersonExercise, personName)
+		} else if personName, ok := flagMap["l"]; ok {
+			ret = fmt.Sprintf(dialogue.PersonSetLanguage, personName)
+		} else if p, ok := flagMap["g"]; ok {
+			ret = fmt.Sprintf(dialogue.LanguageMode, p)
+		} else if personName, ok := flagMap["i"]; ok {
+			ret = fmt.Sprintf(dialogue.PersonEstablishRelationship, personName)
+		} else if personName, ok := flagMap["y"]; ok {
+			ret = fmt.Sprintf(dialogue.PersonRelationshipType, personName)
+		} else if personName, ok := flagMap["h"]; ok {
+			ret = fmt.Sprintf(dialogue.PersonSetBirthday, personName)
+		} else if personName, ok := flagMap["b"]; ok {
+			ret = fmt.Sprintf(dialogue.PersonSetBio, personName)
+		} else if personName, ok := flagMap["m"]; ok {
+			ret = fmt.Sprintf(dialogue.PersonSetAlignment, personName)
+		} else {
+			ret = dialogue.PersonNew
+		}
+	} else if cmd.CommandText == "g" {
+		ret = dialogue.LawNew
+	} else if cmd.CommandText == "h" {
+		ret = dialogue.TimeTravel
+	} else if cmd.CommandText == "i" {
+		ret = dialogue.ReligionNew
+	} else if cmd.CommandText == "j" {
+		ret = dialogue.AdventureNew
+	} else if cmd.CommandText == "k" {
+		ret = dialogue.SettingsConfirm
+	} else if cmd.CommandText == "l" {
+		ret = dialogue.SpeciesNew
+	} else if cmd.CommandText == "m" {
+		ret = dialogue.M
+	} else if cmd.CommandText == "n" {
+		ret = dialogue.Help
+	} else if cmd.CommandText == "o" {
+		ret = dialogue.StatsRandom + "There Are: " + strconv.FormatInt(ReadFromDB(), 10)
+	} else if cmd.CommandText == "p" {
+		ret = dialogue.ParticleNew
+	} else if cmd.CommandText == "q" {
+		ret = dialogue.MusicControl
 	} else if cmd.CommandText == "r" {
-		ret = "There Are: " + strconv.FormatInt(ReadFromDB(), 10)
+		ret = dialogue.PaintingNew
+	} else if cmd.CommandText == "s" {
+		ret = dialogue.PlanetNew
+	} else if cmd.CommandText == "t" {
+		ret = dialogue.ThemeChange
+	} else if cmd.CommandText == "u" {
+		ret = dialogue.DiseaseNew
+	} else if cmd.CommandText == "v" {
+		ret = dialogue.TechnologyNew
+	} else if cmd.CommandText == "w" {
+		ret = dialogue.LandNew
+	} else if cmd.CommandText == "x" {
+		ret = dialogue.SaveFile
+	} else if cmd.CommandText == "y" {
+		ret = dialogue.PsychologyInspect
+	} else if cmd.CommandText == "z" {
+		ret = dialogue.LoadFile
+	} else if cmd.CommandText == "welcome" {
+		ret = dialogue.Introduction
 	} else {
-		ret = "Cmd echo: " + cmd.CommandText
+		ret = "Not a command: " + cmd.CommandText
 	}
 
 	re = Response{ResponseText:ret,ImageFileName:"2.png"} 

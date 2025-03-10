@@ -19,9 +19,15 @@ function runCommand(command) {
         // send request async
         // await get response
         // return response
+        var flags = "abcd";
+        if (command.indexOf(" ") > -1) {
+            var firstSpace = command.indexOf(" ");
+            flags = command.substring(firstSpace + 1, command.length);
+            command = command.substring(0, firstSpace);
+        }
         const response = yield fetch("http://192.168.56.101:8080/commands", {
             method: 'POST',
-            body: '{"command": "' + command + '", "flags": "abcd"}',
+            body: '{"command": "' + command + '", "flags": "' + flags + '"}',
             headers: { 'Content-Type': 'application/json; charset=UTF-8' }
         });
         if (!response.ok) { /* fail */ }
@@ -36,17 +42,23 @@ function runCommand(command) {
 }
 // Shows the welcome message and enables the command line
 function welcome() {
-    let output = document.querySelector('#output');
-    output.innerHTML += "Welcome to Project Indigo. There is a void here." + "\n";
-    let cmd = document.querySelector('#cmd');
-    cmd.addEventListener('keydown', (e) => __awaiter(this, void 0, void 0, function* () {
+    return __awaiter(this, void 0, void 0, function* () {
         let output = document.querySelector('#output');
-        if (e.key === "Enter") {
-            output.innerHTML += (yield runCommand(cmd.value)) + "\n";
-            output.scrollTop = output.scrollHeight;
-            cmd.value = "";
-        }
-    }));
+        let cmd = document.querySelector('#cmd');
+        // output.innerHTML += "Welcome to Project Indigo. There is a void here." + "\n";
+        output.innerHTML += "Indigo is starting... please wait..." + "\n";
+        output.innerHTML += (yield runCommand("welcome")) + "\n";
+        output.scrollTop = output.scrollHeight;
+        cmd.value = "";
+        cmd.addEventListener('keydown', (e) => __awaiter(this, void 0, void 0, function* () {
+            let output = document.querySelector('#output');
+            if (e.key === "Enter") {
+                output.innerHTML += (yield runCommand(cmd.value)) + "\n";
+                output.scrollTop = output.scrollHeight;
+                cmd.value = "";
+            }
+        }));
+    });
 }
 // sends you to the help zone
 function sendhelp() {
